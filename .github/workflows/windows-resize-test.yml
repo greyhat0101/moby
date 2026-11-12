@@ -1,0 +1,37 @@
+name: Windows Resize Test
+
+on:
+  push:
+    branches:
+      - research/resize-console-test
+
+jobs:
+  resize-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.3'
+          cache: true
+
+      - name: Report Go formatting differences
+        shell: pwsh
+        run: |
+          $diff = gofmt -d daemon/internal/libcontainerd/local/resize_windows_test.go
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+          if ($diff) {
+            Write-Host $diff
+            Write-Host "Formatting differences found. Continuing to tests."
+          } else {
+            Write-Host "Go formatting is clean."
+          }
+
+      - name: Run focused Windows resize test
+        run: go test -vet=off ./daemon/internal/libcontainerd/local -run '^TestResizeNarrowsConsoleDimensions$' -v
