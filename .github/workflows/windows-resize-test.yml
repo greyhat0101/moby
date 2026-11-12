@@ -22,16 +22,21 @@ jobs:
       - name: Report Go formatting differences
         shell: pwsh
         run: |
-          $diff = gofmt -d daemon/internal/libcontainerd/local/resize_windows_test.go
-          if ($LASTEXITCODE -ne 0) {
-            exit $LASTEXITCODE
-          }
+          $ErrorActionPreference = 'Continue'
+          $diff = gofmt -d daemon/internal/libcontainerd/local/resize_windows_test.go 2>&1
+          $gofmtExitCode = $LASTEXITCODE
+
+          Write-Host "gofmt exit code: $gofmtExitCode"
+
           if ($diff) {
-            Write-Host $diff
-            Write-Host "Formatting differences found. Continuing to tests."
-          } else {
-            Write-Host "Go formatting is clean."
+            Write-Host ($diff -join "`n")
           }
+
+          if ($gofmtExitCode -ne 0) {
+            exit $gofmtExitCode
+          }
+
+          Write-Host "Formatting check completed."
 
       - name: Run focused Windows resize test
         run: go test -vet=off ./daemon/internal/libcontainerd/local -run '^TestResizeNarrowsConsoleDimensions$' -v
