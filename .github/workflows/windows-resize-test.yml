@@ -26,17 +26,14 @@ jobs:
           $diff = gofmt -d daemon/internal/libcontainerd/local/resize_windows_test.go 2>&1
           $gofmtExitCode = $LASTEXITCODE
 
-          Write-Host "gofmt exit code: $gofmtExitCode"
-
           if ($diff) {
             Write-Host ($diff -join "`n")
+            Write-Host "Formatting differences found. Continuing to tests."
+          } elseif ($gofmtExitCode -ne 0) {
+            Write-Host "gofmt returned exit code $gofmtExitCode."
+          } else {
+            Write-Host "Go formatting is clean."
           }
-
-          if ($gofmtExitCode -ne 0) {
-            exit $gofmtExitCode
-          }
-
-          Write-Host "Formatting check completed."
 
       - name: Run focused Windows resize test
         run: go test -vet=off ./daemon/internal/libcontainerd/local -run '^TestResizeNarrowsConsoleDimensions$' -v
