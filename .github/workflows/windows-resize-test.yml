@@ -27,4 +27,4 @@ jobs:
           exit 0
 
       - name: Run focused Windows resize test
-        run: go test -vet=off ./daemon/internal/libcontainerd/local -run '^TestResizeNarrowsConsoleDimensions$' -v
+        run: go test -count=1 -vet=off ./daemon/internal/libcontainerd/local -run '^TestResizeNarrowsConsoleDimensions$' -v
