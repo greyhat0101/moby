@@ -75,6 +75,13 @@ func TestResizeNarrowsConsoleDimensions(t *testing.T) {
 				t.Fatalf("Resize returned unexpected error: %v", err)
 			}
 
+			t.Logf(
+				"Input: width=%d, height=%d | Received: width=%d, height=%d | Expected: width=%d, height=%d",
+				tc.width, tc.height,
+				mock.width, mock.height,
+				tc.wantWidth, tc.wantHeight,
+			)
+
 			if mock.width != tc.wantWidth {
 				t.Errorf("width: got %d, want %d", mock.width, tc.wantWidth)
 			}
